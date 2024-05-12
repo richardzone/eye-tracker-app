@@ -41,7 +41,7 @@ jobs:
       if: ${{ hashFiles('tests/') != '' }}
     - name: Run Pyinstaller to create release
       run: |
-        pyinstaller -y run.py
+        pyinstaller -y --windowed --add-data translations:translations run.py
     - name: Zip the artifact
       uses: vimtor/action-zip@v1.2
       with:
