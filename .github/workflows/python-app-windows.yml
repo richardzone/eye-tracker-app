@@ -1,0 +1,62 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: lint-test-package-release Python application
+
+on:
+  push:
+    branches: [ "master" ]
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: [windows-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install flake8 pytest pyinstaller
+
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=140 --statistics
+    - name: Test with pytest
+      run: |
+        pytest
+      if: ${{ hashFiles('tests/') != '' }}
+    - name: Run Pyinstaller to create release
+      run: |
+        pyinstaller -y run.py
+    - name: Zip the artifact
+      uses: vimtor/action-zip@v1.2
+      with:
+        files: dist/run
+        dest: eye-tracker-app-windows.zip
+    - name: Upload the artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.sha }}
+        path: eye-tracker-app-windows.zip
+        if-no-files-found: error
+        overwrite: true
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          eye-tracker-app-windows.zip

@@ -1,0 +1,120 @@
+# Chinese translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-05-11 23:55+0800\n"
+"PO-Revision-Date: 2024-05-11 23:55+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: app/main.py:22
+msgid "Invalid Input"
+msgstr "无效输入"
+
+#: app/main.py:34
+msgid "Eye Tracker App"
+msgstr "演示应用"
+
+#: app/main.py:40
+msgid "X Coordinate:"
+msgstr "X坐标："
+
+#: app/main.py:41
+msgid "Y Coordinate:"
+msgstr "Y坐标："
+
+#: app/main.py:49
+msgid "Display Size:"
+msgstr "屏幕尺寸："
+
+#: app/main.py:58
+msgid "Move Mouse To Above Coordinates"
+msgstr "移动光标到上面输入的坐标"
+
+#: app/main.py:61
+msgid "Random Move Mouse"
+msgstr "随即移动鼠标"
+
+#: app/main.py:64
+msgid "Go Crazy (hit Esc to stop)"
+msgstr "疯狂模式（按ESC键退出）"
+
+#: app/main.py:75
+msgid "Select Serial Port:"
+msgstr "选择串口："
+
+#: app/main.py:80
+msgid "Baud Rate:"
+msgstr "传输速率："
+
+#: app/main.py:90 app/serial.py:38
+msgid "No Ports Available"
+msgstr "无可用串口"
+
+#: app/main.py:91
+msgid "Error"
+msgstr "错误"
+
+#: app/main.py:91
+msgid "No serial ports available."
+msgstr "无可用串口"
+
+#: app/main.py:96
+msgid "Connect to Serial (Hit Esc to Disconnect)"
+msgstr "连接到串口（按ESC断开连接）"
+
+#: app/main.py:100
+msgid "Restart App"
+msgstr "重启应用"
+
+#: app/main.py:103
+msgid "© 2024 Eye Tracker"
+msgstr ""
+
+#: app/serial.py:20
+msgid "Got data from {}: {}"
+msgstr "从串口 {} 获得到数据： {}"
+
+#: app/serial.py:26
+msgid "Data does not contain exactly two integers."
+msgstr "数据不是正好包含两个整数"
+
+#: app/serial.py:30
+msgid "ERROR: error parsing above line, invalid data, error is: {}"
+msgstr "无法识别上面的串口数据，错误是：{}"
+
+#: app/serial.py:50
+msgid "Connected to {}"
+msgstr "已连接到 {}"
+
+#: app/serial.py:53
+msgid "Failed to connect: {}"
+msgstr "无法连接到 {}"
+
+#: app/serial.py:63
+msgid "Disconnected from {}"
+msgstr "已经从 {} 断开连接"
+
+#: app/window_actions.py:35
+msgid "Coordinates must be valid non-negative integers."
+msgstr "坐标必须是非负整数"
+
+#: app/window_actions.py:39
+msgid "Coordinates must be non-negative."
+msgstr "坐标必须不是负数"
+
+#: app/window_actions.py:41
+msgid "Coordinates must be within screen size: {}x{}."
+msgstr "坐标必须在屏幕坐标范围内：{}x{}"
+
