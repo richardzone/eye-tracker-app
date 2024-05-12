@@ -13,10 +13,12 @@ _, _lang = setup_localization()
 serial_data_queue = queue.Queue()
 current_serial_connection = None
 
+
 # Assuming this is in your `app.serial` module
 def get_current_serial_connection():
     global current_serial_connection
     return current_serial_connection
+
 
 def read_from_serial(ser):
     global current_serial_connection, serial_data_queue
