@@ -101,7 +101,7 @@ class TestSerial(unittest.TestCase):
             result = start_serial_thread("COM8", 9600)
 
             mock_disconnect.assert_called_once()
-            mock_serial.assert_called_once_with("COM8", 9600, timeout=5)
+            mock_serial.assert_called_once_with("COM8", 9600, timeout=0)
             mock_thread.assert_called_once()
             mock_queue_put.assert_called()
             self.assertTrue(result)
@@ -119,7 +119,7 @@ class TestSerial(unittest.TestCase):
             result = start_serial_thread("COM8", 9600)
 
             mock_disconnect.assert_called_once()
-            mock_serial.assert_called_once_with("COM8", 9600, timeout=5)
+            mock_serial.assert_called_once_with("COM8", 9600, timeout=0)
             mock_queue_put.assert_called()
             self.assertFalse(result)
 

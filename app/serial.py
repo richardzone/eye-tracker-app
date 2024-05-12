@@ -59,7 +59,7 @@ def start_serial_thread(port, baud_rate):
     disconnect_from_serial()
 
     try:
-        ser = serial.Serial(port, baud_rate, timeout=5)
+        ser = serial.Serial(port, baud_rate, timeout=0)
         current_serial_connection = ser
         threading.Thread(target=read_from_serial, args=(ser,), daemon=True).start()
         serial_data_queue.put(
