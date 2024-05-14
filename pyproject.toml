@@ -19,7 +19,7 @@ eye-tracker = "app.main:gui_main"
 
 [project.optional-dependencies]
 # Optional dependencies, can be installed via "your_project_name[testing]"
-testing = [
+development = [
     "pytest>=8.2.0",
     "Babel>=2.15.0",
     "pyinstaller>=6.6.0"

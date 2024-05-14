@@ -31,7 +31,6 @@ To simulate coordinates data from COM port on a Windows desktop, follow these st
 1. Install Python >= 3.12
 2.
 ```shell
-python -m venv venv
 ./venv/bin/activate
 pip install -e .
 pytest # to run tests
