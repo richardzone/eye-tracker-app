@@ -6,17 +6,37 @@ from app.serial import (
     read_from_serial,
     get_serial_ports,
     start_serial_thread,
+    CommandParser,
+    CoordinateCommand,
+    CalibrationRequiredCommand,
+    CalibrationDoneCommand
 )
 
 
 class TestSerial(unittest.TestCase):
-    def test_read_from_serial_successful(self):
+
+    def test_coordinate_command_matches(self):
+        coordinate_command = CoordinateCommand()
+        test_strings = ['[-100,200]', '(123, 234)', '455, 123.5', '123,456,789', '1,,2', '(abc, def)']
+
+        expected_matches = [True, True, True, True, False, False]
+
+        for test_string, expected_match in zip(test_strings, expected_matches):
+            with self.subTest(test_string=test_string, expected_match=expected_match):
+                matches = coordinate_command.matches(test_string)
+                self.assertEqual(matches, expected_match, f"Unexpected result for '{test_string}'")
+
+
+    def test_read_from_serial_coordinates(self):
         mock_ser = Mock()
+        mock_ser.port = "COM8"
         mock_ser.in_waiting = True
-        mock_ser.readline.return_value = b"100,200\n"
+        mock_ser.readline.return_value = b"[100,200]\n"
 
         mock_queue = Mock()
         mock_move_mouse = Mock()
+
+        parser = CommandParser(commands=[CoordinateCommand(), CalibrationRequiredCommand(), CalibrationDoneCommand()])
 
         with patch(
             "app.serial.get_current_serial_connection"
@@ -24,15 +44,69 @@ class TestSerial(unittest.TestCase):
             "app.serial.serial_data_queue", mock_queue
         ), patch("app.serial.move_mouse", mock_move_mouse):
             mock_get_current_serial.side_effect = [mock_ser, None]
-            read_from_serial(mock_ser)
+            read_from_serial(mock_ser, parser)
 
         # Assert the expected calls were made
         mock_queue.put.assert_has_calls(
             [
-                call("Got data from {}: 100,200".format(mock_ser.port) + "\n"),
+                call("Received data from {}: [100,200]".format(mock_ser.port) + "\n"),
             ]
         )
-        mock_move_mouse.assert_called_once_with("100", "200", 0.2)
+        mock_move_mouse.assert_called_once_with('100', '200', 0.2)
+
+    def test_read_from_serial_calibration_required(self):
+        mock_ser = Mock()
+        mock_ser.port = "COM8"
+        mock_ser.in_waiting = True
+        mock_ser.readline.return_value = b"calibration_required\n"
+
+        mock_queue = Mock()
+        mock_show_calibration_dot = Mock()
+
+        parser = CommandParser(commands=[CoordinateCommand(), CalibrationRequiredCommand(), CalibrationDoneCommand()])
+
+        with patch(
+            "app.serial.get_current_serial_connection"
+        ) as mock_get_current_serial, patch(
+            "app.serial.serial_data_queue", mock_queue
+        ), patch("app.serial.show_calibration_dot", mock_show_calibration_dot):
+            mock_get_current_serial.side_effect = [mock_ser, None]
+            read_from_serial(mock_ser, parser)
+
+        mock_queue.put.assert_has_calls(
+            [
+                call("Received data from {}: calibration_required".format(mock_ser.port) + "\n"),
+                call("Calibration required: showing calibration dot\n"),
+            ]
+        )
+        mock_show_calibration_dot.assert_called_once()
+
+    def test_read_from_serial_calibration_done(self):
+        mock_ser = Mock()
+        mock_ser.port = "COM8"
+        mock_ser.in_waiting = True
+        mock_ser.readline.return_value = b"calibration_done\n"
+
+        mock_queue = Mock()
+        mock_hide_calibration_dot = Mock()
+
+        parser = CommandParser(commands=[CoordinateCommand(), CalibrationRequiredCommand(), CalibrationDoneCommand()])
+
+        with patch(
+            "app.serial.get_current_serial_connection"
+        ) as mock_get_current_serial, patch(
+            "app.serial.serial_data_queue", mock_queue
+        ), patch("app.serial.hide_calibration_dot", mock_hide_calibration_dot):
+            mock_get_current_serial.side_effect = [mock_ser, None]
+            read_from_serial(mock_ser, parser)
+
+        mock_queue.put.assert_has_calls(
+            [
+                call("Received data from {}: calibration_done".format(mock_ser.port) + "\n"),
+                call("Calibration done: hiding calibration dot\n"),
+            ]
+        )
+        mock_hide_calibration_dot.assert_called_once()
 
     def test_read_from_serial_invalid_data(self):
         mock_ser = Mock()
@@ -41,19 +115,21 @@ class TestSerial(unittest.TestCase):
         mock_ser.readline.return_value = b"invalid_data\n"
         mock_queue = Mock()
 
+        parser = CommandParser(commands=[CoordinateCommand(), CalibrationRequiredCommand(), CalibrationDoneCommand()])
+
         with patch(
             "app.serial.get_current_serial_connection"
         ) as mock_get_current_serial, patch(
             "app.serial.serial_data_queue", mock_queue
         ), patch("app.serial.move_mouse") as mock_move_mouse:
             mock_get_current_serial.side_effect = [mock_ser, None]
-            read_from_serial(mock_ser)
+            read_from_serial(mock_ser, parser)
 
             mock_queue.put.assert_has_calls(
                 [
-                    call("Got data from {}: invalid_data\n".format(mock_ser.port)),
+                    call("Received data from {}: invalid_data\n".format(mock_ser.port)),
                     call(
-                        "ERROR: error parsing above line, invalid data, error is: Data does not contain exactly two integers.\n"
+                        "ERROR: error parsing above line, invalid data, error is: Unknown command: invalid_data\n"
                     ),
                 ]
             )
@@ -90,7 +166,8 @@ class TestSerial(unittest.TestCase):
         )
 
     def test_start_serial_thread_success(self):
-        mock_serial = MagicMock(port="COM8")
+        mock_serial = MagicMock()
+        mock_serial.return_value.port = "COM8"
         with patch(
             "app.serial.serial.Serial", mock_serial
         ), patch(

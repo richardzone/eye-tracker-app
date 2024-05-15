@@ -156,7 +156,7 @@ def gui_main():
             if line:
                 log_output.insert("end", line + "\n")
                 log_output.see("end")  # Auto-scroll to the bottom
-        root.after(100, update_log_output)  # Schedule to run again after 100 ms
+        root.after(50, update_log_output)  # Schedule to run again after 50 ms
 
     update_log_output()
 
