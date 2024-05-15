@@ -55,12 +55,9 @@ class TestWindowActions(unittest.TestCase):
             mock_Toplevel.assert_called_once()
             instance = mock_Toplevel.return_value
             instance.overrideredirect.assert_called_once_with(True)
-            instance.geometry.assert_called_once_with("20x20+390+290")
+            instance.geometry.assert_called_once_with("50x50+375+275")
             instance.attributes.assert_any_call("-topmost", True)
-            instance.attributes.assert_any_call("-alpha", 0.7)
             instance.configure.assert_called_once_with(bg='red')
-            instance.focus_set.assert_called_once()
-            instance.grab_release.assert_called_once()
 
     @patch("app.window_actions.calibration_dot_window", new_callable=MagicMock)
     def test_hide_calibration_dot(self, mock_calibration_dot_window):

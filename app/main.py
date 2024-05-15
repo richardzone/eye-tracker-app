@@ -11,6 +11,7 @@ from .window_actions import (
     move_mouse_randomly,
     stop_crazy_mouse_movement,
     viewport_size,
+    hide_calibration_dot
 )
 from .serial import (
     get_serial_ports,
@@ -27,6 +28,7 @@ _, lang = setup_localization()
 def on_escape(event=None):
     stop_crazy_mouse_movement()
     disconnect_from_serial()
+    hide_calibration_dot()
 
 
 def validate_and_move_mouse(x_str, y_str):
