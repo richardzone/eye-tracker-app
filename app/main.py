@@ -11,7 +11,7 @@ from .window_actions import (
     move_mouse_randomly,
     stop_crazy_mouse_movement,
     viewport_size,
-    hide_calibration_dot
+    hide_calibration_dot,
 )
 from .serial import (
     get_serial_ports,

@@ -50,14 +50,16 @@ class TestWindowActions(unittest.TestCase):
 
     @patch("app.window_actions.viewport_size", return_value=(800, 600))
     def test_show_calibration_dot(self, mock_viewport_size):
-        with patch("app.window_actions.tk.Toplevel", new_callable=MagicMock) as mock_Toplevel:
+        with patch(
+            "app.window_actions.tk.Toplevel", new_callable=MagicMock
+        ) as mock_Toplevel:
             show_calibration_dot()
             mock_Toplevel.assert_called_once()
             instance = mock_Toplevel.return_value
             instance.overrideredirect.assert_called_once_with(True)
             instance.geometry.assert_called_once_with("50x50+375+275")
             instance.attributes.assert_any_call("-topmost", True)
-            instance.configure.assert_called_once_with(bg='red')
+            instance.configure.assert_called_once_with(bg="red")
 
     @patch("app.window_actions.calibration_dot_window", new_callable=MagicMock)
     def test_hide_calibration_dot(self, mock_calibration_dot_window):
@@ -70,7 +72,6 @@ class TestWindowActions(unittest.TestCase):
     def test_hide_calibration_dot_when_not_visible(self):
         hide_calibration_dot()  # Should not raise an exception or call destroy
         self.assertIsNone(calibration_dot_window)
-
 
 
 if __name__ == "__main__":

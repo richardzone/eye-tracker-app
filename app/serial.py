@@ -6,7 +6,7 @@ import queue
 from .window_actions import move_mouse, show_calibration_dot, hide_calibration_dot
 import re
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Optional, Union
+from typing import List, Optional
 
 from .localization import setup_localization
 
@@ -18,6 +18,7 @@ current_serial_connection: Optional[serial.Serial] = None
 CALIBRATION_REQUIRED = "calibration_required"
 CALIBRATION_DONE = "calibration_done"
 
+
 def get_current_serial_connection() -> Optional[serial.Serial]:
     """
     Returns the currently active serial connection, if any.
@@ -25,10 +26,12 @@ def get_current_serial_connection() -> Optional[serial.Serial]:
     global current_serial_connection
     return current_serial_connection
 
+
 class Command(ABC):
     """
     Abstract base class for command objects.
     """
+
     @abstractmethod
     def matches(self, line: str) -> bool:
         """
@@ -48,11 +51,12 @@ class CoordinateCommand(Command):
     """
     Command class for handling coordinate commands.
     """
+
     def matches(self, line: str) -> bool:
         """
         Checks if the given line matches the coordinate command pattern.
         """
-        match = re.search(r'\d+,\s*\d+', line)
+        match = re.search(r"\d+,\s*\d+", line)
         return bool(match)
 
     def execute(self, line: str) -> bool:
@@ -70,6 +74,7 @@ class CalibrationRequiredCommand(Command):
     """
     Command class for handling calibration_required commands.
     """
+
     def matches(self, line: str) -> bool:
         """
         Checks if the given line matches the calibration_required command.
@@ -89,6 +94,7 @@ class CalibrationDoneCommand(Command):
     """
     Command class for handling calibration_done commands.
     """
+
     def matches(self, line: str) -> bool:
         """
         Checks if the given line matches the calibration_done command.
@@ -108,13 +114,18 @@ class CommandParser:
     """
     Class for parsing and executing commands from serial input.
     """
+
     def __init__(self, commands: Optional[List[Command]] = None):
         """
         Initializes the CommandParser with a list of command objects.
         If no list is provided, it uses the default set of commands.
         """
         if commands is None:
-            self.commands = [CoordinateCommand(), CalibrationRequiredCommand(), CalibrationDoneCommand()]
+            self.commands = [
+                CoordinateCommand(),
+                CalibrationRequiredCommand(),
+                CalibrationDoneCommand(),
+            ]
         else:
             self.commands = commands
 
@@ -137,12 +148,19 @@ def read_from_serial(ser: serial.Serial, parser: CommandParser) -> None:
     while get_current_serial_connection() is ser:
         if ser.in_waiting:
             line = ser.readline().decode("utf-8").rstrip()
-            serial_data_queue.put(_("Received data from {}: {}").format(ser.port, line) + "\n")
+            serial_data_queue.put(
+                _("Received data from {}: {}").format(ser.port, line) + "\n"
+            )
 
             try:
                 parser.parse(line)
             except ValueError as e:
-                serial_data_queue.put(_("ERROR: error parsing above line, invalid data, error is: {}").format(e) + "\n")
+                serial_data_queue.put(
+                    _(
+                        "ERROR: error parsing above line, invalid data, error is: {}"
+                    ).format(e)
+                    + "\n"
+                )
 
         time.sleep(0.1)
 
@@ -154,7 +172,10 @@ def get_serial_ports() -> List[str]:
     ports = [port.device for port in list_ports.comports()]
     return ports if ports else [_("No Ports Available")]
 
-def start_serial_thread(port: str, baud_rate: int, parser: Optional[CommandParser] = None) -> bool:
+
+def start_serial_thread(
+    port: str, baud_rate: int, parser: Optional[CommandParser] = None
+) -> bool:
     """
     Starts a new thread for reading from the serial connection.
     Returns True if the thread was started successfully, False otherwise.
@@ -168,8 +189,12 @@ def start_serial_thread(port: str, baud_rate: int, parser: Optional[CommandParse
     try:
         ser = serial.Serial(port, baud_rate, timeout=0)
         current_serial_connection = ser
-        threading.Thread(target=read_from_serial, args=(ser, parser), daemon=True).start()
-        serial_data_queue.put(_("Connected to {}").format(current_serial_connection.port) + "\n")
+        threading.Thread(
+            target=read_from_serial, args=(ser, parser), daemon=True
+        ).start()
+        serial_data_queue.put(
+            _("Connected to {}").format(current_serial_connection.port) + "\n"
+        )
         return True
     except serial.SerialException as e:
         serial_data_queue.put(_("Failed to connect: {}").format(e))
