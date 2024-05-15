@@ -76,7 +76,7 @@ class TestSerial(unittest.TestCase):
         mock_queue.put.assert_has_calls(
             [
                 call("Received data from {}: calibration_required".format(mock_ser.port) + "\n"),
-                call("Calibration required: showing calibration dot\n"),
+                call("calibration_required: showing calibration dot\n"),
             ]
         )
         mock_show_calibration_dot.assert_called_once()
@@ -103,7 +103,7 @@ class TestSerial(unittest.TestCase):
         mock_queue.put.assert_has_calls(
             [
                 call("Received data from {}: calibration_done".format(mock_ser.port) + "\n"),
-                call("Calibration done: hiding calibration dot\n"),
+                call("calibration_done: hiding calibration dot\n"),
             ]
         )
         mock_hide_calibration_dot.assert_called_once()
