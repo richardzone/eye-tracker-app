@@ -1,5 +1,14 @@
 # Eye Tracker App
 
+This companion app will listen for commands input from eye tracker hardware via serial port and execute its commands accordingly.
+
+Currently there are 3 types of commands:
+1. A pair of coordinates between `(0,0)` and `(SCREEN_WIDTH, SCREEN_HEIGHT)` - move the mouse cursor to the specified coordinates
+2. `calibration_required` - show a red calibration square on center of screen
+3. `calibration_done` - hide the calibration square if present
+
+Note that all commands MUST ends with `\n` to be valid.
+
 This app is designed for demo purpose on Windows platform. It should run on MacOS and Linux as well but untested.
 
 ## Simulated Run Instructions for Windows
@@ -10,17 +19,21 @@ To simulate coordinates data from COM port on a Windows desktop, follow these st
 2. Run the above application, create a `Local Bridge` with default options (first port name is `COM1` and second port name is `COM2`)
 3. Download **[Coordinates_Serial_Generator](https://github.com/richardzone/coordinates_serial_generator/releases/)** and run it. You should see log output like below:
     ```log
-    Sent to COM2: b'[77, 388]'
+    Sent to COM2: calibration_done
 
-    Sent to COM2: b'[1432, 130]'
+    Now sleeping for 1.31 seconds
 
-    Sent to COM2: b'[925, 230]'
+    Sent to COM2: (1522, 226)
 
-    Sent to COM2: b'[350, 358]'
+    Now sleeping for 0.53 seconds
 
-    Sent to COM2: b'[633, 336]'
+    Sent to COM2: calibration_done
 
-    Sent to COM2: b'[739, 597]'
+    Now sleeping for 1.73 seconds
+
+    Sent to COM2: calibration_required
+
+    Now sleeping for 0.91 seconds
     ```
 
 4. Finally download **[this app (Eye Tracker App)](https://github.com/richardzone/eye-tracker-app/releases/)** and run it. Select Serial Port `COM1` and click `Connect to Serial (Hit Esc to Disconnect)`. You should see the mouse cursor moving around, triggered by data sent via serial port from the **Coordinates_Serial_Generator**.
@@ -33,7 +46,7 @@ To simulate coordinates data from COM port on a Windows desktop, follow these st
 ```shell
 ./venv/bin/activate
 pip install -e .
-pytest # to run tests
 python run.py # to run app
+pytest # to run tests
 pyinstaller -y --windowed --add-data translations:translations run.py # to create app release in dist folder
 ```
