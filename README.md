@@ -1,5 +1,8 @@
 # Eye Tracker App
 
+[![Python Version Badge](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Frichardzone%2Feye-tracker-app%2Fmaster%2Fpyproject.toml)](https://github.com/richardzone/eye-tracker-app/blob/master/pyproject.toml)
+[![Build Status Badge](https://img.shields.io/github/actions/workflow/status/richardzone/eye-tracker-app/python-app-windows.yml)](https://github.com/richardzone/eye-tracker-app/actions)
+
 This companion app will listen for commands input from eye tracker hardware via serial port and execute its commands accordingly.
 
 Currently there are 3 types of commands:
