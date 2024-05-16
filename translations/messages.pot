@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-11 23:55+0800\n"
+"POT-Creation-Date: 2024-05-16 10:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,103 +17,115 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: app/main.py:22
+#: app/main.py:38
 msgid "Invalid Input"
 msgstr ""
 
-#: app/main.py:34
+#: app/main.py:45
 msgid "Eye Tracker App"
 msgstr ""
 
-#: app/main.py:40
+#: app/main.py:68
 msgid "X Coordinate:"
 msgstr ""
 
-#: app/main.py:41
+#: app/main.py:69
 msgid "Y Coordinate:"
 msgstr ""
 
-#: app/main.py:49
+#: app/main.py:77
 msgid "Display Size:"
 msgstr ""
 
-#: app/main.py:58
+#: app/main.py:88
 msgid "Move Mouse To Above Coordinates"
 msgstr ""
 
-#: app/main.py:61
+#: app/main.py:94
 msgid "Random Move Mouse"
 msgstr ""
 
-#: app/main.py:64
+#: app/main.py:100
 msgid "Go Crazy (hit Esc to stop)"
 msgstr ""
 
-#: app/main.py:75
+#: app/main.py:115
 msgid "Select Serial Port:"
 msgstr ""
 
-#: app/main.py:80
+#: app/main.py:122
 msgid "Baud Rate:"
 msgstr ""
 
-#: app/main.py:90 app/serial.py:38
+#: app/main.py:132 app/serial.py:173
 msgid "No Ports Available"
 msgstr ""
 
-#: app/main.py:91
+#: app/main.py:133
 msgid "Error"
 msgstr ""
 
-#: app/main.py:91
+#: app/main.py:133
 msgid "No serial ports available."
 msgstr ""
 
-#: app/main.py:96
+#: app/main.py:139
 msgid "Connect to Serial (Hit Esc to Disconnect)"
 msgstr ""
 
-#: app/main.py:100
+#: app/main.py:145
 msgid "Restart App"
 msgstr ""
 
-#: app/main.py:103
+#: app/main.py:149
 msgid "© 2024 Eye Tracker"
 msgstr ""
 
-#: app/serial.py:20
-msgid "Got data from {}: {}"
-msgstr ""
-
-#: app/serial.py:26
+#: app/serial.py:68
 msgid "Data does not contain exactly two integers."
 msgstr ""
 
-#: app/serial.py:30
+#: app/serial.py:88
+msgid "calibration_required: showing calibration dot"
+msgstr ""
+
+#: app/serial.py:108
+msgid "calibration_done: hiding calibration dot"
+msgstr ""
+
+#: app/serial.py:140
+msgid "Unknown command: {}"
+msgstr ""
+
+#: app/serial.py:152
+msgid "Received data from {}: {}"
+msgstr ""
+
+#: app/serial.py:159
 msgid "ERROR: error parsing above line, invalid data, error is: {}"
 msgstr ""
 
-#: app/serial.py:50
+#: app/serial.py:196
 msgid "Connected to {}"
 msgstr ""
 
-#: app/serial.py:53
+#: app/serial.py:200
 msgid "Failed to connect: {}"
 msgstr ""
 
-#: app/serial.py:63
+#: app/serial.py:213
 msgid "Disconnected from {}"
 msgstr ""
 
-#: app/window_actions.py:35
+#: app/window_actions.py:39
 msgid "Coordinates must be valid non-negative integers."
 msgstr ""
 
-#: app/window_actions.py:39
+#: app/window_actions.py:43
 msgid "Coordinates must be non-negative."
 msgstr ""
 
-#: app/window_actions.py:41
+#: app/window_actions.py:46
 msgid "Coordinates must be within screen size: {}x{}."
 msgstr ""
 
