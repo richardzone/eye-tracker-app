@@ -13,6 +13,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
         python-version: [3.12]
@@ -44,8 +45,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=140 --statistics
 
     - name: Test with pytest and collect coverage
-      run: |
-        pytest --cov=./ --cov-report=xml
+      uses: coactions/setup-xvfb@v1
+      with:
+        run: |
+          pytest --cov=./ --cov-report=xml
       if: ${{ hashFiles('tests/') != '' }}
 
     - name: Upload coverage to Codecov
