@@ -46,12 +46,17 @@ To simulate coordinates data from COM port on a Windows desktop, follow these st
 
 ## Local dev environment setup
 
-1. Install Python >= 3.12
-2.
+Note that Python version should >= 3.10
+
 ```shell
-./venv/bin/activate
-pip install -e .
-python run.py # to run app
+sudo apt-get update # On debian-based linux
+sudo apt-get install -y scrot python3-tk python3-dev binutils python3 python3-pip python3-venv # On debian-based linux
+rm -rf venv # Change this to "del venv" on Windows
+python3 -m venv venv
+source ./venv/bin/activate   # Change this command to "source ./venv/Scripts/activate" on Windows
+python3 -m pip install -e .
+python3 -m pip install "eye_tracker_app[development]"
+python3 run.py # to run app
 pytest # to run tests
 pyinstaller -y --windowed --add-data translations:translations run.py # to create app release in dist folder
 ```
