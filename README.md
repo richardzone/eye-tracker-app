@@ -1,7 +1,7 @@
 # Eye Tracker App
 
 [![Python Version Badge](https://img.shields.io/python/required-version-toml?style=for-the-badge&tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Frichardzone%2Feye-tracker-app%2Fmaster%2Fpyproject.toml)](https://github.com/richardzone/eye-tracker-app/blob/master/pyproject.toml)
-[![Build Test Upload Status Badge](https://img.shields.io/github/actions/workflow/status/richardzone/eye-tracker-app/python-app-windows.yml?style=for-the-badge&label=Build%20Test%20Upload)](https://github.com/richardzone/eye-tracker-app/actions)
+[![Build Test Upload Status Badge](https://img.shields.io/github/actions/workflow/status/richardzone/eye-tracker-app/python-app-windows-linux.yml?style=for-the-badge&label=Build%20Test%20Upload)](https://github.com/richardzone/eye-tracker-app/actions)
 [![Code Coverage Badge](https://img.shields.io/codecov/c/github/richardzone/eye-tracker-app?style=for-the-badge&label=Code%20Coverage)](https://app.codecov.io/gh/richardzone/eye-tracker-app)
 
 
