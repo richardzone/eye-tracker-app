@@ -41,7 +41,7 @@ To simulate coordinates data from COM port on a Windows desktop, follow these st
     Now sleeping for 0.91 seconds
     ```
 
-4. Finally download **[this app (Eye Tracker App)](https://github.com/richardzone/eye-tracker-app/releases/)** and run it. Select Serial Port `COM1` and click `Connect to Serial (Hit Esc to Disconnect)`. You should see the mouse cursor moving around, triggered by data sent via serial port from the **Coordinates_Serial_Generator**.
+4. Finally download **[this app (Eye Tracker App)](https://github.com/richardzone/eye-tracker-app/releases/)** and run it. Select Serial Port `COM1` and click `Connect to Serial (Hit Esc to Disconnect)`. You should see the mouse cursor moving around, triggered by data sent via serial port from the **Coordinates_Serial_Generator**. Note that on Linux you may need to run `xhost +` before running this app to give permission to Window system.
 
 
 ## Local dev environment setup
@@ -56,6 +56,7 @@ python3 -m venv venv
 source ./venv/bin/activate   # Change this command to "source ./venv/Scripts/activate" on Windows
 python3 -m pip install -e .
 python3 -m pip install "eye_tracker_app[development]"
+xhost + # This may be needed on Linux to get permission to connect to Window system
 python3 run.py # to run app
 pytest # to run tests
 pyinstaller -y --windowed --add-data translations:translations run.py # to create app release in dist folder
