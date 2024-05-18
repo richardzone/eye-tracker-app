@@ -11,14 +11,25 @@ permissions:
 
 jobs:
   build:
-    runs-on: [windows-latest]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python-version: [3.12]
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.12
+    - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: "3.12"
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Linux-specific dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y scrot python3-tk python3-dev
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -51,17 +62,33 @@ jobs:
       run: |
         pyinstaller -y --windowed --add-data translations:translations run.py
 
-    - name: Zip the artifact
+    - name: Zip the artifact (Windows)
+      if: runner.os == 'Windows'
       uses: vimtor/action-zip@v1.2
       with:
         files: dist/run
         dest: eye-tracker-app-windows.zip
 
-    - name: Upload the artifact
+    - name: Zip the artifact (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        zip -r eye-tracker-app-linux.zip dist/run
+
+    - name: Upload the artifact (Windows)
+      if: runner.os == 'Windows'
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ github.sha }}
+        name: ${{ github.sha }}-windows
         path: eye-tracker-app-windows.zip
+        if-no-files-found: error
+        overwrite: true
+
+    - name: Upload the artifact (Linux)
+      if: runner.os == 'Linux'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.sha }}-linux
+        path: eye-tracker-app-linux.zip
         if-no-files-found: error
         overwrite: true
 
@@ -71,3 +98,4 @@ jobs:
       with:
         files: |
           eye-tracker-app-windows.zip
+          eye-tracker-app-linux.zip
