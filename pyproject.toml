@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "eye_tracker_app"
 dynamic = ["version"]
-requires-python = ">= 3.10"
+requires-python = ">= 3.8"
 readme = "README.md"
 authors = [
   {name = "Richard", email = "1625351+richardzone@users.noreply.github.com"}]

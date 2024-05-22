@@ -46,7 +46,7 @@ To simulate coordinates data from COM port on a Windows desktop, follow these st
 
 ## Local dev environment setup
 
-Note that Python version should >= 3.10
+Note that Python version should >= 3.8
 
 ```shell
 sudo apt-get update # On debian-based linux
