@@ -9,7 +9,9 @@ import cv2.aruco as aruco
 import numpy as np
 import random
 import math
+import logging
 
+from .video_capture import get_video_devices, start_video_thread, stop_video_capture
 from .window_actions import (
     crazy_mouse_movement,
     move_mouse,
@@ -17,25 +19,39 @@ from .window_actions import (
     stop_crazy_mouse_movement,
     viewport_size,
     hide_calibration_dot,
+    show_aruco_marker,
+    hide_aruco_marker,
+    MarkerPosition
 )
 from .serial import (
     get_serial_ports,
-    serial_data_queue,
     start_serial_thread,
     disconnect_from_serial,
 )
 from .localization import setup_localization
 
 _, lang = setup_localization()
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-marker_size = 100
-img_x = 1000 - marker_size
+
+class TkinterLoggingHandler(logging.Handler):
+    def __init__(self, log_widget):
+        super().__init__()
+        self.log_widget = log_widget
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.log_widget.insert(tk.END, log_entry + '\n')
+        self.log_widget.see(tk.END)  # Auto-scroll to the bottom
+
 
 def on_escape(event=None):
     stop_crazy_mouse_movement()
     disconnect_from_serial()
+    stop_video_capture()
     hide_calibration_dot()
     hide_aruco_marker()
+
 
 def validate_and_move_mouse(x_str, y_str):
     try:
@@ -43,147 +59,23 @@ def validate_and_move_mouse(x_str, y_str):
     except ValueError as e:
         messagebox.showerror(_("Invalid Input"), str(e))
 
-def generate_aruco_marker():
-    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-    marker_size = 100
-    marker_image = np.zeros((marker_size, marker_size), dtype=np.uint8)
-    cv2.aruco.drawMarker(aruco_dict, 0, marker_size, marker_image, 1)
-    return marker_image
-
-def show_aruco_marker():
-    global marker_label
-    marker_image = generate_aruco_marker()
-    marker_image_pil = Image.fromarray(marker_image)
-    marker_image_tk = ImageTk.PhotoImage(marker_image_pil)
-
-    if marker_label is None:
-        marker_label = tk.Label(root, image=marker_image_tk)
-        marker_label.image = marker_image_tk
-        marker_label.place(x=0, y=0)
-    else:
-        marker_label.config(image=marker_image_tk)
-        marker_label.image = marker_image_tk
-        marker_label.place(x=0, y=0)
-
-def hide_aruco_marker():
-    global marker_label
-    if marker_label is not None:
-        marker_label.place_forget()
-
-def detect_aruco_markers(frame):
-    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-
-    img0 = frame[img_x-50:img_x+marker_size+50, 1*marker_size-50:2*marker_size+50]
-    corners, ids, _ = cv2.aruco.detectMarkers(image=img0, dictionary=aruco_dict)
-    marker_id0 = ids[0][0] if ids is not None else 0
-
-    img1 = frame[img_x-50:img_x+marker_size+50, 3*marker_size-50:4*marker_size+50]
-    corners, ids, _ = cv2.aruco.detectMarkers(image=img1, dictionary=aruco_dict)
-    marker_id1 = ids[0][0] if ids is not None else 0
-
-    img2 = frame[img_x-50:img_x+marker_size+50, 5*marker_size-50:6*marker_size+50]
-    corners, ids, _ = cv2.aruco.detectMarkers(image=img2, dictionary=aruco_dict)
-    marker_id2 = ids[0][0] if ids is not None else 0
-
-    img3 = frame[img_x-50:img_x+marker_size+50, 7*marker_size-50:8*marker_size+50]
-    corners, ids, _ = cv2.aruco.detectMarkers(image=img3, dictionary=aruco_dict)
-    marker_id3 = ids[0][0] if ids is not None else 0
-
-    x = 100 * marker_id0 + marker_id1
-    y = 100 * marker_id2 + marker_id3
-
-    return x, y
-
-def det_arcor(img):
-
-    aruco_dict = aruco.getPredefinedDictionary(dict=aruco.DICT_6X6_100)
-
-    img0 = img[img_x-50:img_x+marker_size+50, 1*marker_size-50:2*marker_size+50]
-    # cv2.imshow("img0", img0)
-    # cv2.waitKey(0)
-
-    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img0,
-                                                         dictionary=aruco_dict,
-                                                         parameters=None)
-    # print(ids)
-    count = 0
-    marker_id0 = 0;
-    if ids is not None:
-       marker_id0 = ids[0][0]
-       count += 1
-
-    img1 = img[img_x-50:img_x+marker_size+50, 3*marker_size-50:4*marker_size+50]
-    # cv2.imshow("img1", img1)
-    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img1,
-                                                         dictionary=aruco_dict,
-                                                         parameters=None)
-    marker_id1 = 0
-    if ids is not None:
-       marker_id1 = ids[0][0]
-       count += 1
-
-    img2 = img[img_x-50:img_x+marker_size+50, 5*marker_size-50:6*marker_size+50]
-    # cv2.imshow("img2", img2)
-    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img2,
-                                                         dictionary=aruco_dict,
-                                                         parameters=None)
-    marker_id2 = 0
-    if ids is not None:
-       marker_id2 = ids[0][0]
-       count += 1
-
-    img3 = img[img_x-50:img_x+marker_size+50, 7*marker_size-50:8*marker_size+50]
-    # cv2.imshow("img3", img3)
-    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img3,
-                                                         dictionary=aruco_dict,
-                                                         parameters=None)
-    marker_id3 = 0
-    if ids is not None:
-       marker_id3 = ids[0][0]
-       count += 1
-
-    x = 100*marker_id0+marker_id1
-    y = 100*marker_id2+marker_id3
-
-    return x, y, count
-
-def video_thread():
-    cap = cv2.VideoCapture(0)
-
-    if not cap.isOpened():
-        print("Cannot open camera")
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-
-    print(f"camera opened: {cap}")
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("cap.read is False, continuing..")
-            continue
-        print(f"ret: {ret}, frame: {frame}")
-        x_det, y_det, _ = det_arcor(frame)
-        print(f"x_det: {x_det}, y_det: {y_det}")
-        move_mouse(x_det, y_det)
-
-        # cv2.imshow('Camera', frame)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-            # break
-
-    cap.release()
-    cv2.destroyAllWindows()
 
 def gui_main():
-    global root, marker_label
-    marker_label = None
 
     screen_width, screen_height = viewport_size()
 
     root = tk.Tk()
     root.title(_("Eye Tracker App"))
     root.bind("<Escape>", on_escape)  # Bind the Escape key
-    root.bind("1", lambda event: show_aruco_marker())  # Bind the "1" key
+    root.bind("1", lambda event: show_aruco_marker(position=MarkerPosition.TOPLEFT))
+    root.bind("2", lambda event: show_aruco_marker(position=MarkerPosition.TOPCENTER))
+    root.bind("3", lambda event: show_aruco_marker(position=MarkerPosition.TOPRIGHT))
+    root.bind("4", lambda event: show_aruco_marker(position=MarkerPosition.MIDDLELEFT))
+    root.bind("5", lambda event: show_aruco_marker(position=MarkerPosition.CENTER))
+    root.bind("6", lambda event: show_aruco_marker(position=MarkerPosition.MIDDLERIGHT))
+    root.bind("7", lambda event: show_aruco_marker(position=MarkerPosition.BOTTOMLEFT))
+    root.bind("8", lambda event: show_aruco_marker(position=MarkerPosition.BOTTOMCENTER))
+    root.bind("9", lambda event: show_aruco_marker(position=MarkerPosition.BOTTOMRIGHT))
 
     frame = tk.Frame(root)
     frame.pack(expand=True)
@@ -264,49 +156,68 @@ def gui_main():
     baud_entry = tk.Entry(frame, textvariable=baud_var)
     baud_entry.grid(row=13, column=1, padx=10, pady=5)
 
+    # Dropdown for video device selection
+    video_devices = get_video_devices()
+    video_devices_var = tk.StringVar(root)
+    video_devices_var.set(video_devices[0])  # Set to first available port or message
+    tk.Label(frame, text=_("Select Video Device:")).grid(
+        row=14, column=0, padx=10, pady=5
+    )
+    video_device_dropdown = tk.OptionMenu(frame, video_devices_var, *video_devices)
+    video_device_dropdown.grid(row=14, column=1, padx=10, pady=5)
+
     # Log output section
     log_output = scrolledtext.ScrolledText(frame, height=10)
-    log_output.grid(row=14, column=0, columnspan=2, pady=10)
+    log_output.grid(row=15, column=0, columnspan=2, pady=10)
 
-    def connect():
+    # Add the custom logging handler
+    log_handler = TkinterLoggingHandler(log_output)
+    log_handler.setLevel(logging.DEBUG)
+    log_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logging.getLogger().addHandler(log_handler)
+
+    def connect_to_serial():
         if port_var.get() == _("No Ports Available"):
             messagebox.showerror(_("Error"), _("No serial ports available."))
             return
         start_serial_thread(port_var.get(), baud_var.get())
 
-    # Connect button
-    connect_button = tk.Button(
-        frame, text=_("Connect to Serial (Hit Esc to Disconnect)"), command=connect
+    connect_to_serial_button = tk.Button(
+        frame, text=_("Connect to Serial (Hit Esc to Disconnect)"), command=connect_to_serial
     )
-    connect_button.grid(row=15, column=0, columnspan=2, pady=10)
+    connect_to_serial_button.grid(row=16, column=0, columnspan=2, pady=10)
+
+    def capture_video():
+        if video_devices_var.get() == _("No Video Devices Available"):
+            messagebox.showerror(_("Error"), _("No Video Devices Available"))
+            return
+
+        # Create a new top-level window for video display
+        video_window = tk.Toplevel(root)
+        video_window.title(_("Video Capture"))
+
+        video_canvas = tk.Canvas(video_window, width=1280, height=720)
+        video_canvas.pack()
+
+        start_video_thread(int(video_devices_var.get()), video_canvas)
+
+    start_video_capture_button = tk.Button(
+        frame, text=_("Start Video Capture (Hit Esc to Stop)"), command=capture_video
+    )
+    start_video_capture_button.grid(row=17, column=0, columnspan=2, pady=10)
 
     # Restart App button
     refresh_button = tk.Button(
         frame, text=_("Restart App"), command=lambda: restart_app(language_var.get())
     )
-    refresh_button.grid(row=16, column=0, columnspan=2, padx=10)
+    refresh_button.grid(row=18, column=0, columnspan=2, padx=10)
 
     copyright_label = tk.Label(frame, text=_("© 2024 Eye Tracker"), font=("Arial", 8))
-    copyright_label.grid(row=17, column=0, columnspan=2, pady=10)
+    copyright_label.grid(row=19, column=0, columnspan=2, pady=10)
 
     root.minsize(550, 300)
 
-    def update_log_output():
-        while not serial_data_queue.empty():
-            line = serial_data_queue.get()
-            if line:
-                log_output.insert("end", line + "\n")
-                log_output.see("end")  # Auto-scroll to the bottom
-        root.after(50, update_log_output)  # Schedule to run again after 50 ms
-
-    update_log_output()
-
-    # Start the video processing thread
-    threading.Thread(target=video_thread, daemon=True).start()
-
     root.mainloop()
-
 
 if __name__ == "__main__":
     gui_main()
-

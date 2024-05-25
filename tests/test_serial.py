@@ -54,7 +54,7 @@ class TestSerial(unittest.TestCase):
         with patch(
             "app.serial.get_current_serial_connection"
         ) as mock_get_current_serial, patch(
-            "app.serial.serial_data_queue", mock_queue
+            "app.serial.log_data_queue", mock_queue
         ), patch("app.serial.move_mouse", mock_move_mouse):
             mock_get_current_serial.side_effect = [mock_ser, None]
             read_from_serial(mock_ser, parser)
@@ -87,7 +87,7 @@ class TestSerial(unittest.TestCase):
         with patch(
             "app.serial.get_current_serial_connection"
         ) as mock_get_current_serial, patch(
-            "app.serial.serial_data_queue", mock_queue
+            "app.serial.log_data_queue", mock_queue
         ), patch("app.serial.show_calibration_dot", mock_show_calibration_dot):
             mock_get_current_serial.side_effect = [mock_ser, None]
             read_from_serial(mock_ser, parser)
@@ -123,7 +123,7 @@ class TestSerial(unittest.TestCase):
         with patch(
             "app.serial.get_current_serial_connection"
         ) as mock_get_current_serial, patch(
-            "app.serial.serial_data_queue", mock_queue
+            "app.serial.log_data_queue", mock_queue
         ), patch("app.serial.hide_calibration_dot", mock_hide_calibration_dot):
             mock_get_current_serial.side_effect = [mock_ser, None]
             read_from_serial(mock_ser, parser)
@@ -157,7 +157,7 @@ class TestSerial(unittest.TestCase):
         with patch(
             "app.serial.get_current_serial_connection"
         ) as mock_get_current_serial, patch(
-            "app.serial.serial_data_queue", mock_queue
+            "app.serial.log_data_queue", mock_queue
         ), patch("app.serial.move_mouse") as mock_move_mouse:
             mock_get_current_serial.side_effect = [mock_ser, None]
             read_from_serial(mock_ser, parser)
@@ -209,7 +209,7 @@ class TestSerial(unittest.TestCase):
             "app.serial.disconnect_from_serial"
         ) as mock_disconnect, patch(
             "app.serial.threading.Thread"
-        ) as mock_thread, patch("app.serial.serial_data_queue.put") as mock_queue_put:
+        ) as mock_thread, patch("app.serial.log_data_queue.put") as mock_queue_put:
             result = start_serial_thread("COM8", 9600)
 
             mock_disconnect.assert_called_once()
@@ -222,7 +222,7 @@ class TestSerial(unittest.TestCase):
         with patch("app.serial.serial.Serial") as mock_serial, patch(
             "app.serial.disconnect_from_serial"
         ) as mock_disconnect, patch(
-            "app.serial.serial_data_queue.put"
+            "app.serial.log_data_queue.put"
         ) as mock_queue_put:
             mock_serial.side_effect = serial.SerialException("Connection failed")
 
@@ -241,7 +241,7 @@ class TestSerial(unittest.TestCase):
         mock_queue.put.assert_not_called()
 
         with patch("app.serial.current_serial_connection", mock_ser):
-            with patch("app.serial.serial_data_queue", mock_queue):
+            with patch("app.serial.log_data_queue", mock_queue):
                 disconnect_from_serial()
 
         mock_ser.close.assert_called_once()

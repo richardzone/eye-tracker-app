@@ -2,22 +2,22 @@ import serial
 import threading
 import time
 from serial.tools import list_ports
-import queue
-from .window_actions import move_mouse, show_calibration_dot, hide_calibration_dot
 import re
 from abc import ABC, abstractmethod
 from typing import List, Optional
+import logging
 
+from .window_actions import move_mouse, show_calibration_dot, hide_calibration_dot
 from .localization import setup_localization
 
 _, _lang = setup_localization()
 
-serial_data_queue: queue.Queue = queue.Queue()
 current_serial_connection: Optional[serial.Serial] = None
 
 CALIBRATION_REQUIRED = "calibration_required"
 CALIBRATION_DONE = "calibration_done"
 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 def get_current_serial_connection() -> Optional[serial.Serial]:
     """
@@ -85,7 +85,7 @@ class CalibrationRequiredCommand(Command):
         """
         Executes the calibration_required command by showing the calibration dot.
         """
-        serial_data_queue.put(_("calibration_required: showing calibration dot") + "\n")
+        logging.info(_("calibration_required: showing calibration dot"))
         show_calibration_dot()
         return True
 
@@ -105,7 +105,7 @@ class CalibrationDoneCommand(Command):
         """
         Executes the calibration_done command by hiding the calibration dot.
         """
-        serial_data_queue.put(_("calibration_done: hiding calibration dot") + "\n")
+        logging.info(_("calibration_done: hiding calibration dot"))
         hide_calibration_dot()
         return True
 
@@ -144,23 +144,16 @@ def read_from_serial(ser: serial.Serial, parser: CommandParser) -> None:
     """
     Reads data from the serial connection and parses/executes commands.
     """
-    global current_serial_connection, serial_data_queue
+    global current_serial_connection
     while get_current_serial_connection() is ser:
         if ser.in_waiting:
             line = ser.readline().decode("utf-8").rstrip()
-            serial_data_queue.put(
-                _("Received data from {}: {}").format(ser.port, line) + "\n"
-            )
+            logging.info(_("Received data from {}: {}").format(ser.port, line))
 
             try:
                 parser.parse(line)
             except ValueError as e:
-                serial_data_queue.put(
-                    _(
-                        "ERROR: error parsing above line, invalid data, error is: {}"
-                    ).format(e)
-                    + "\n"
-                )
+                logging.error(_("ERROR: error parsing above line, invalid data, error is: {}").format(e))
 
         time.sleep(0.1)
 
@@ -192,12 +185,10 @@ def start_serial_thread(
         threading.Thread(
             target=read_from_serial, args=(ser, parser), daemon=True
         ).start()
-        serial_data_queue.put(
-            _("Connected to {}").format(current_serial_connection.port) + "\n"
-        )
+        logging.info(_("Connected to {}").format(current_serial_connection.port))
         return True
     except serial.SerialException as e:
-        serial_data_queue.put(_("Failed to connect: {}").format(e))
+        logging.error(_("Failed to connect: {}").format(e))
         return False
 
 
@@ -210,4 +201,4 @@ def disconnect_from_serial() -> None:
         port = current_serial_connection.port
         current_serial_connection.close()
         current_serial_connection = None
-        serial_data_queue.put(_("Disconnected from {}").format(port) + "\n")
+        logging.info(_("Disconnected from {}").format(port))
