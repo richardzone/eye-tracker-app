@@ -96,22 +96,24 @@ def detect_aruco_markers(frame):
 def video_thread():
     print("inside video_thread")
     cap = cv2.VideoCapture(0)
+    print("after cv2.VideoCapture")
     print(cap)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
     while True:
+        print('before cap.read()')
         ret, frame = cap.read()
-        print(ret, frame)
+        print(f"ret: {ret}, frame: {frame}")
         if not ret:
             break
         x_det, y_det = detect_aruco_markers(frame)
-        print(x_det, y_det)
+        print(f"x_det: {x_det}, y_det: {y_det}")
         move_mouse(x_det, y_det)
 
-        cv2.imshow('Camera', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # cv2.imshow('Camera', frame)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+            # break
 
     cap.release()
     cv2.destroyAllWindows()
