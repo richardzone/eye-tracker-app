@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
 from PIL import Image, ImageTk
 import cv2
+import cv2.aruco as aruco
 import numpy as np
 import random
 import math
@@ -93,21 +94,76 @@ def detect_aruco_markers(frame):
 
     return x, y
 
+def det_arcor(img):
+
+    aruco_dict = aruco.getPredefinedDictionary(dict=aruco.DICT_6X6_100)
+
+    img0 = img[img_x-50:img_x+marker_size+50, 1*marker_size-50:2*marker_size+50]
+    # cv2.imshow("img0", img0)
+    # cv2.waitKey(0)
+
+    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img0,
+                                                         dictionary=aruco_dict,
+                                                         parameters=None)
+    # print(ids)
+    count = 0
+    marker_id0 = 0;
+    if ids is not None:
+       marker_id0 = ids[0][0]
+       count += 1
+
+    img1 = img[img_x-50:img_x+marker_size+50, 3*marker_size-50:4*marker_size+50]
+    # cv2.imshow("img1", img1)
+    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img1,
+                                                         dictionary=aruco_dict,
+                                                         parameters=None)
+    marker_id1 = 0
+    if ids is not None:
+       marker_id1 = ids[0][0]
+       count += 1
+
+    img2 = img[img_x-50:img_x+marker_size+50, 5*marker_size-50:6*marker_size+50]
+    # cv2.imshow("img2", img2)
+    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img2,
+                                                         dictionary=aruco_dict,
+                                                         parameters=None)
+    marker_id2 = 0
+    if ids is not None:
+       marker_id2 = ids[0][0]
+       count += 1
+
+    img3 = img[img_x-50:img_x+marker_size+50, 7*marker_size-50:8*marker_size+50]
+    # cv2.imshow("img3", img3)
+    corners, ids, rejectedImgPoints = aruco.detectMarkers(image=img3,
+                                                         dictionary=aruco_dict,
+                                                         parameters=None)
+    marker_id3 = 0
+    if ids is not None:
+       marker_id3 = ids[0][0]
+       count += 1
+
+    x = 100*marker_id0+marker_id1
+    y = 100*marker_id2+marker_id3
+
+    return x, y, count
+
 def video_thread():
-    print("inside video_thread")
     cap = cv2.VideoCapture(0)
-    print("after cv2.VideoCapture")
-    print(cap)
+
+    if not cap.isOpened():
+        print("Cannot open camera")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
+    print(f"camera opened: {cap}")
+
     while True:
-        print('before cap.read()')
         ret, frame = cap.read()
-        print(f"ret: {ret}, frame: {frame}")
         if not ret:
-            break
-        x_det, y_det = detect_aruco_markers(frame)
+            print("cap.read is False, continuing..")
+            continue
+        print(f"ret: {ret}, frame: {frame}")
+        x_det, y_det, _ = det_arcor(frame)
         print(f"x_det: {x_det}, y_det: {y_det}")
         move_mouse(x_det, y_det)
 
