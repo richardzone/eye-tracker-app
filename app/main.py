@@ -1,9 +1,13 @@
 import os
 import sys
 import threading
-
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
+from PIL import Image, ImageTk
+import cv2
+import numpy as np
+import random
+import math
 
 from .window_actions import (
     crazy_mouse_movement,
@@ -19,17 +23,18 @@ from .serial import (
     start_serial_thread,
     disconnect_from_serial,
 )
-
 from .localization import setup_localization
 
 _, lang = setup_localization()
 
+marker_size = 100
+img_x = 1000 - marker_size
 
 def on_escape(event=None):
     stop_crazy_mouse_movement()
     disconnect_from_serial()
     hide_calibration_dot()
-
+    hide_aruco_marker()
 
 def validate_and_move_mouse(x_str, y_str):
     try:
@@ -37,13 +42,90 @@ def validate_and_move_mouse(x_str, y_str):
     except ValueError as e:
         messagebox.showerror(_("Invalid Input"), str(e))
 
+def generate_aruco_marker():
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
+    marker_size = 100
+    marker_image = np.zeros((marker_size, marker_size), dtype=np.uint8)
+    cv2.aruco.drawMarker(aruco_dict, 0, marker_size, marker_image, 1)
+    return marker_image
+
+def show_aruco_marker():
+    global marker_label
+    marker_image = generate_aruco_marker()
+    marker_image_pil = Image.fromarray(marker_image)
+    marker_image_tk = ImageTk.PhotoImage(marker_image_pil)
+
+    if marker_label is None:
+        marker_label = tk.Label(root, image=marker_image_tk)
+        marker_label.image = marker_image_tk
+        marker_label.place(x=0, y=0)
+    else:
+        marker_label.config(image=marker_image_tk)
+        marker_label.image = marker_image_tk
+        marker_label.place(x=0, y=0)
+
+def hide_aruco_marker():
+    global marker_label
+    if marker_label is not None:
+        marker_label.place_forget()
+
+def detect_aruco_markers(frame):
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
+
+    img0 = frame[img_x-50:img_x+marker_size+50, 1*marker_size-50:2*marker_size+50]
+    corners, ids, _ = cv2.aruco.detectMarkers(image=img0, dictionary=aruco_dict)
+    marker_id0 = ids[0][0] if ids is not None else 0
+
+    img1 = frame[img_x-50:img_x+marker_size+50, 3*marker_size-50:4*marker_size+50]
+    corners, ids, _ = cv2.aruco.detectMarkers(image=img1, dictionary=aruco_dict)
+    marker_id1 = ids[0][0] if ids is not None else 0
+
+    img2 = frame[img_x-50:img_x+marker_size+50, 5*marker_size-50:6*marker_size+50]
+    corners, ids, _ = cv2.aruco.detectMarkers(image=img2, dictionary=aruco_dict)
+    marker_id2 = ids[0][0] if ids is not None else 0
+
+    img3 = frame[img_x-50:img_x+marker_size+50, 7*marker_size-50:8*marker_size+50]
+    corners, ids, _ = cv2.aruco.detectMarkers(image=img3, dictionary=aruco_dict)
+    marker_id3 = ids[0][0] if ids is not None else 0
+
+    x = 100 * marker_id0 + marker_id1
+    y = 100 * marker_id2 + marker_id3
+
+    return x, y
+
+def video_thread():
+    print("inside video_thread")
+    cap = cv2.VideoCapture(1)
+    print(cap)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+    while True:
+        ret, frame = cap.read()
+        print(ret, frame)
+        if not ret:
+            break
+        x_det, y_det = detect_aruco_markers(frame)
+        print(x_det, y_det)
+        move_mouse(x_det, y_det)
+
+        cv2.imshow('Camera', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 def gui_main():
+    global root, marker_label
+    marker_label = None
+
     screen_width, screen_height = viewport_size()
 
     root = tk.Tk()
     root.title(_("Eye Tracker App"))
     root.bind("<Escape>", on_escape)  # Bind the Escape key
+    root.bind("1", lambda event: show_aruco_marker())  # Bind the "1" key
 
     frame = tk.Frame(root)
     frame.pack(expand=True)
@@ -149,7 +231,6 @@ def gui_main():
     copyright_label = tk.Label(frame, text=_("© 2024 Eye Tracker"), font=("Arial", 8))
     copyright_label.grid(row=17, column=0, columnspan=2, pady=10)
 
-    # root.update_idletasks()
     root.minsize(550, 300)
 
     def update_log_output():
@@ -162,8 +243,12 @@ def gui_main():
 
     update_log_output()
 
+    # Start the video processing thread
+    threading.Thread(target=video_thread, daemon=True).start()
+
     root.mainloop()
 
 
 if __name__ == "__main__":
     gui_main()
+
