@@ -95,7 +95,7 @@ def detect_aruco_markers(frame):
 
 def video_thread():
     print("inside video_thread")
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     print(cap)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
