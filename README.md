@@ -55,7 +55,7 @@ rm -rf venv # Change this to "del venv" on Windows
 python3 -m venv venv
 source ./venv/bin/activate   # Change this command to "source ./venv/Scripts/activate" on Windows
 python3 -m pip install -e .
-python3 -m pip install "eye_tracker_app[development]"
+python3 -m pip install -e .[development]
 xhost + # This may be needed on Linux to get permission to connect to Window system
 python3 run.py # to run app
 pytest # to run tests
