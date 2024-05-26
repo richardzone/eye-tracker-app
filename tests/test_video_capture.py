@@ -87,7 +87,6 @@ class TestVideoCapture(unittest.TestCase):
         mock_stop_video_capture.assert_called_once()
         mock_thread.assert_called_once_with(target=read_from_video_device, args=(0, canvas), daemon=True)
         mock_thread_instance.start.assert_called_once()
-
     @patch("cv2.VideoCapture")
     @patch("app.video_capture.detect_aruco_markers")
     @patch("app.video_capture.convert_aruco_marker_ids_to_coordinates")
@@ -114,18 +113,21 @@ class TestVideoCapture(unittest.TestCase):
         mock_fromarray.return_value = mock_img_pil
 
         canvas = MagicMock()
-        stop_event = threading.Event()
-        stop_event.clear()
+
+        # Mock stop_event and set the side effect for is_set method
+        mock_stop_event = Mock()
+        mock_stop_event.is_set.side_effect = [False, False, False, False, True]
 
         with patch("app.video_capture.current_video_device", mock_cap), \
-            patch("app.video_capture.stop_event", stop_event):
-
+             patch("app.video_capture.stop_event", mock_stop_event):
             read_from_video_device(0, canvas)
             self.assertTrue(mock_cap.read.called)
+            self.assertEqual(mock_cap.read.call_count, 4)  # 4 reads before stopping
             mock_detect_aruco_markers.assert_called()
             mock_convert_aruco_marker_ids_to_coordinates.assert_called()
             mock_move_mouse.assert_called()
             mock_draw_video_image_to_canvas.assert_called()
+
 
     @patch("PIL.ImageTk.PhotoImage")
     @patch("PIL.Image.fromarray")
