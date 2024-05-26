@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-16 10:07+0800\n"
+"POT-Creation-Date: 2024-05-27 04:47+0800\n"
 "PO-Revision-Date: 2024-05-16 10:07+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -18,116 +18,152 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: app/main.py:38
+#: app/main.py:54
 msgid "Invalid Input"
 msgstr "无效输入"
 
-#: app/main.py:45
+#: app/main.py:61
 msgid "Eye Tracker App"
 msgstr "眼动追踪演示应用"
 
-#: app/main.py:68
+#: app/main.py:93
 msgid "X Coordinate:"
 msgstr "X坐标："
 
-#: app/main.py:69
+#: app/main.py:94
 msgid "Y Coordinate:"
 msgstr "Y坐标："
 
-#: app/main.py:77
+#: app/main.py:102
 msgid "Display Size:"
 msgstr "屏幕尺寸："
 
-#: app/main.py:88
+#: app/main.py:113
 msgid "Move Mouse To Above Coordinates"
 msgstr "移动光标到上面输入的坐标"
 
-#: app/main.py:94
+#: app/main.py:119
 msgid "Random Move Mouse"
 msgstr "随机移动鼠标"
 
-#: app/main.py:100
+#: app/main.py:125
 msgid "Go Crazy (hit Esc to stop)"
 msgstr "疯狂模式（按ESC键退出）"
 
-#: app/main.py:115
+#: app/main.py:140
 msgid "Select Serial Port:"
 msgstr "选择串口："
 
-#: app/main.py:122
+#: app/main.py:147
 msgid "Baud Rate:"
 msgstr "传输速率："
 
-#: app/main.py:132 app/serial.py:173
+#: app/main.py:156
+msgid "Select Video Device:"
+msgstr "选择视频采集设备："
+
+#: app/main.py:173 app/serial.py:168
 msgid "No Ports Available"
 msgstr "无可用串口"
 
-#: app/main.py:133
+#: app/main.py:174 app/main.py:185
 msgid "Error"
 msgstr "错误"
 
-#: app/main.py:133
+#: app/main.py:174
 msgid "No serial ports available."
 msgstr "无可用串口"
 
-#: app/main.py:139
+#: app/main.py:179
 msgid "Connect to Serial (Hit Esc to Disconnect)"
 msgstr "连接到串口（按ESC断开连接）"
 
-#: app/main.py:145
+#: app/main.py:184 app/main.py:185 app/video_capture.py:115
+#, fuzzy
+msgid "No Video Devices Available"
+msgstr "无可用串口"
+
+#: app/main.py:190
+msgid "Video Capture"
+msgstr "视频采集"
+
+#: app/main.py:198
+#, fuzzy
+msgid "Start Video Capture (Hit Esc to Stop)"
+msgstr "开启视频采集（按ESC中止）"
+
+#: app/main.py:204
 msgid "Restart App"
 msgstr "重启应用"
 
-#: app/main.py:149
+#: app/main.py:208
 msgid "© 2024 Eye Tracker"
 msgstr "© 2024 Eye Tracker"
 
-#: app/serial.py:68
+#: app/serial.py:70
 msgid "Data does not contain exactly two integers."
 msgstr "数据不是正好包含两个整数"
 
-#: app/serial.py:88
+#: app/serial.py:90
 msgid "calibration_required: showing calibration dot"
 msgstr "需要校准：开启校准色块显示"
 
-#: app/serial.py:108
+#: app/serial.py:110
 msgid "calibration_done: hiding calibration dot"
 msgstr "校准已完成：隐藏校准色块"
 
-#: app/serial.py:140
+#: app/serial.py:142
 msgid "Unknown command: {}"
 msgstr "未知命令：{}"
 
-#: app/serial.py:152
+#: app/serial.py:153
 #, fuzzy
 msgid "Received data from {}: {}"
 msgstr "从串口 {} 获得到数据： {}"
 
-#: app/serial.py:159
+#: app/serial.py:158
 msgid "ERROR: error parsing above line, invalid data, error is: {}"
 msgstr "无法识别上面的串口数据，错误是：{}"
 
-#: app/serial.py:196
+#: app/serial.py:190
 msgid "Connected to {}"
 msgstr "已连接到 {}"
 
-#: app/serial.py:200
+#: app/serial.py:193
 msgid "Failed to connect: {}"
 msgstr "无法连接到 {}"
 
-#: app/serial.py:213
+#: app/serial.py:206
 msgid "Disconnected from {}"
 msgstr "已经从 {} 断开连接"
 
-#: app/window_actions.py:39
+#: app/video_capture.py:67
+msgid "Opened video device {}"
+msgstr "已经启动视频采集设备 {}"
+
+#: app/video_capture.py:128
+#, fuzzy
+msgid "Failed to open video device: {}"
+msgstr "无法启动视频采集设备： {}"
+
+#: app/video_capture.py:135
+msgid "End video capture from {}"
+msgstr "结束从 {} 的视频采集"
+
+#: app/window_actions.py:125
 msgid "Coordinates must be valid non-negative integers."
 msgstr "坐标必须是非负整数"
 
-#: app/window_actions.py:43
+#: app/window_actions.py:128
+#, fuzzy
+msgid "Coordinates must not be None and must be convertible to integers."
+msgstr "坐标必须是非负整数"
+
+#: app/window_actions.py:133
 msgid "Coordinates must be non-negative."
 msgstr "坐标必须不是负数"
 
-#: app/window_actions.py:46
+#: app/window_actions.py:137
 msgid "Coordinates must be within screen size: {}x{}."
 msgstr "坐标必须在屏幕坐标范围内：{}x{}"
 
