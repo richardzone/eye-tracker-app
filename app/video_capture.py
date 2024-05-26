@@ -75,14 +75,7 @@ def read_from_video_device(device_index, video_canvas) -> None:
             logging.warning("cap.read is False, retrying...")
             continue
 
-        img = cv2.resize(frame, (1280, 720))
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img_pil = Image.fromarray(img_rgb)
-        img_tk = ImageTk.PhotoImage(image=img_pil)
-
-        if video_canvas.winfo_exists():
-            video_canvas.img_tk = img_tk  # Keep a reference to prevent garbage collection
-            video_canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+        draw_video_image_to_canvas(frame, video_canvas)
 
         marker_ids = detect_aruco_markers(frame)
         logging.debug(f"marker_ids: {marker_ids}")
@@ -92,6 +85,16 @@ def read_from_video_device(device_index, video_canvas) -> None:
             move_mouse(x, y)
 
         cv2.waitKey(50)
+
+
+def draw_video_image_to_canvas(frame, video_canvas):
+    img = cv2.resize(frame, (1280, 720))
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_pil = Image.fromarray(img_rgb)
+    img_tk = ImageTk.PhotoImage(image=img_pil)
+    if video_canvas.winfo_exists():
+        video_canvas.img_tk = img_tk  # Keep a reference to prevent garbage collection
+        video_canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
 
 
 def get_video_devices():

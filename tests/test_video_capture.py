@@ -4,7 +4,8 @@ import cv2
 import cv2.aruco as aruco
 import threading
 import numpy as np
-from PIL import ImageTk
+from PIL import ImageTk, Image
+import tkinter
 
 from app.video_capture import (
     convert_aruco_marker_ids_to_coordinates,
@@ -14,7 +15,9 @@ from app.video_capture import (
     stop_video_capture,
     read_from_video_device,
     get_current_video_device,
+    draw_video_image_to_canvas
 )
+
 
 class TestVideoCapture(unittest.TestCase):
 
@@ -40,9 +43,9 @@ class TestVideoCapture(unittest.TestCase):
         self.assertEqual(marker_ids, [])
 
     @patch("cv2.VideoCapture")
-    def test_get_video_devices(self, mock_VideoCapture):
+    def test_get_video_devices(self, mock_video_capture):
         mock_cap = Mock()
-        mock_VideoCapture.return_value = mock_cap
+        mock_video_capture.return_value = mock_cap
 
         # Provide enough values to cover all iterations of the loop (10 times)
         side_effect_values = [(True, Mock())] * 3
@@ -55,17 +58,35 @@ class TestVideoCapture(unittest.TestCase):
         video_device_indices = get_video_devices()
         self.assertEqual(video_device_indices, [0, 1, 2])
 
-    @patch("cv2.VideoCapture")
-    def test_stop_video_capture(self, mock_VideoCapture):
-        mock_cap = Mock()
-        mock_VideoCapture.return_value = mock_cap
-        mock_cap.isOpened.return_value = True
+    @patch("time.sleep")
+    def test_stop_video_capture(self, mock_sleep):
+        # Mock the current_video_device and stop_event
+        mock_current_video_device = Mock()
+        mock_stop_event = threading.Event()
 
-        global current_video_device
-        current_video_device = mock_cap
+        # Ensure stop_event is initialized
+        mock_stop_event.clear()
 
-        stop_video_capture()
-        self.assertTrue(mock_cap.release.called)
+        with patch("app.video_capture.current_video_device", mock_current_video_device), \
+            patch("app.video_capture.stop_event", mock_stop_event):
+            stop_video_capture()
+            self.assertTrue(mock_stop_event.is_set())
+            mock_sleep.assert_called_once_with(1)
+            self.assertTrue(mock_current_video_device.release.called)
+
+    @patch("threading.Thread")
+    @patch("app.video_capture.stop_video_capture")
+    def test_start_video_thread(self, mock_stop_video_capture, mock_thread):
+        mock_thread_instance = Mock()
+        mock_thread.return_value = mock_thread_instance
+
+        canvas = MagicMock()
+        result = start_video_thread(0, canvas)
+
+        self.assertTrue(result)
+        mock_stop_video_capture.assert_called_once()
+        mock_thread.assert_called_once_with(target=read_from_video_device, args=(0, canvas), daemon=True)
+        mock_thread_instance.start.assert_called_once()
 
     @patch("cv2.VideoCapture")
     @patch("app.video_capture.detect_aruco_markers")
@@ -73,7 +94,9 @@ class TestVideoCapture(unittest.TestCase):
     @patch("app.video_capture.move_mouse")
     @patch("PIL.Image.fromarray")
     @patch("app.video_capture.get_current_video_device")
-    def test_read_from_video_device(self, mock_get_current_video_device, mock_fromarray, mock_move_mouse,
+    @patch("app.video_capture.draw_video_image_to_canvas")
+    def test_read_from_video_device(self, mock_draw_video_image_to_canvas, mock_get_current_video_device,
+                                    mock_fromarray, mock_move_mouse,
                                     mock_convert_aruco_marker_ids_to_coordinates, mock_detect_aruco_markers,
                                     mock_video_capture):
         mock_cap = Mock()
@@ -84,18 +107,43 @@ class TestVideoCapture(unittest.TestCase):
 
         mock_get_current_video_device.return_value = mock_cap
         mock_convert_aruco_marker_ids_to_coordinates.return_value = (100, 200)
-        mock_fromarray.return_value.size = (1920, 1080)  # Set a size for the mock image
+
+        # Create a mock image with a valid mode
+        mock_img_pil = Mock(spec=Image.Image)
+        mock_img_pil.mode = 'RGB'
+        mock_fromarray.return_value = mock_img_pil
 
         canvas = MagicMock()
         stop_event = threading.Event()
         stop_event.clear()
 
-        read_from_video_device(0, canvas)
-        self.assertTrue(mock_cap.read.called)
-        mock_detect_aruco_markers.assert_called_once()
-        mock_convert_aruco_marker_ids_to_coordinates.assert_called_once()
-        mock_move_mouse.assert_called_once_with(100, 200)
-        self.assertTrue(canvas.create_image.called)
+        with patch("app.video_capture.current_video_device", mock_cap), \
+            patch("app.video_capture.stop_event", stop_event):
+
+            read_from_video_device(0, canvas)
+            self.assertTrue(mock_cap.read.called)
+            mock_detect_aruco_markers.assert_called()
+            mock_convert_aruco_marker_ids_to_coordinates.assert_called()
+            mock_move_mouse.assert_called()
+            mock_draw_video_image_to_canvas.assert_called()
+
+    @patch("PIL.ImageTk.PhotoImage")
+    @patch("PIL.Image.fromarray")
+    def test_draw_video_image_to_canvas(self, mock_fromarray, mock_photoimage):
+        mock_frame = np.zeros((1080, 1920, 3), dtype=np.uint8)  # Creating a dummy frame
+        mock_img_pil = Mock(spec=Image.Image)
+        mock_fromarray.return_value = mock_img_pil
+        mock_img_tk = Mock()
+        mock_photoimage.return_value = mock_img_tk
+
+        canvas = MagicMock()
+        draw_video_image_to_canvas(mock_frame, canvas)
+
+        mock_fromarray.assert_called_once()
+        mock_photoimage.assert_called_once()
+        canvas.create_image.assert_called_once_with(0, 0, anchor=tkinter.NW, image=mock_img_tk)
+        self.assertEqual(canvas.img_tk, mock_img_tk)
+
 
 if __name__ == '__main__':
     unittest.main()
