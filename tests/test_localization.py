@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import patch
-from app.localization import setup_localization
 from argparse import Namespace
+from unittest.mock import patch
+
+from app.localization import setup_localization
 
 
 class TestLocalization(unittest.TestCase):

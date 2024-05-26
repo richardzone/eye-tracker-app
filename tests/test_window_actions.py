@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
-import logging
+
 import numpy as np
+
 from app.window_actions import (
     show_calibration_dot,
     hide_calibration_dot,

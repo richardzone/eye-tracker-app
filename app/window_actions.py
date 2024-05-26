@@ -1,12 +1,12 @@
-import pyautogui
-import tkinter as tk
-import random
 import logging
-from PIL import Image, ImageTk
-import cv2
-import numpy as np
+import random
+import tkinter as tk
 from enum import Enum
 
+import cv2
+import numpy as np
+import pyautogui
+from PIL import Image, ImageTk
 
 from .localization import setup_localization
 
@@ -21,11 +21,13 @@ calibration_dot_window = None
 
 aruco_marker_window = None
 
+
 def generate_aruco_marker(marker_id: int, marker_size, dictionary=cv2.aruco.DICT_7X7_250):
     aruco_dict = cv2.aruco.getPredefinedDictionary(dict=dictionary)
     marker_image = np.zeros((marker_size, marker_size), dtype=np.uint8)
     cv2.aruco.drawMarker(aruco_dict, marker_id, marker_size, marker_image, 1)
     return marker_image
+
 
 class MarkerPosition(Enum):
     TOPLEFT = 1
@@ -37,6 +39,7 @@ class MarkerPosition(Enum):
     BOTTOMLEFT = 7
     BOTTOMCENTER = 8
     BOTTOMRIGHT = 9
+
 
 def get_position_coordinates(position, marker_size, screen_width, screen_height):
     if position == MarkerPosition.TOPLEFT:
@@ -59,6 +62,7 @@ def get_position_coordinates(position, marker_size, screen_width, screen_height)
         return screen_width - marker_size, screen_height - marker_size
     else:
         return 0, 0
+
 
 def show_aruco_marker(position: MarkerPosition, marker_size=200, dictionary=cv2.aruco.DICT_7X7_250):
     global aruco_marker_window
@@ -86,11 +90,13 @@ def show_aruco_marker(position: MarkerPosition, marker_size=200, dictionary=cv2.
     marker_label.image = marker_image_tk
     marker_label.pack()
 
+
 def hide_aruco_marker():
     global aruco_marker_window
     if aruco_marker_window:
         aruco_marker_window.destroy()
         aruco_marker_window = None
+
 
 def crazy_mouse_movement():
     global crazy_movement_active

@@ -1,6 +1,6 @@
-import os
-import gettext
 import argparse
+import gettext
+import os
 
 
 def setup_localization():

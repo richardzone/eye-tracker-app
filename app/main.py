@@ -1,16 +1,16 @@
+import logging
 import os
 import sys
 import threading
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
-from PIL import Image, ImageTk
-import cv2
-import cv2.aruco as aruco
-import numpy as np
-import random
-import math
-import logging
 
+from .localization import setup_localization
+from .serial import (
+    get_serial_ports,
+    start_serial_thread,
+    disconnect_from_serial,
+)
 from .video_capture import get_video_devices, start_video_thread, stop_video_capture
 from .window_actions import (
     crazy_mouse_movement,
@@ -23,12 +23,6 @@ from .window_actions import (
     hide_aruco_marker,
     MarkerPosition
 )
-from .serial import (
-    get_serial_ports,
-    start_serial_thread,
-    disconnect_from_serial,
-)
-from .localization import setup_localization
 
 _, lang = setup_localization()
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -61,7 +55,6 @@ def validate_and_move_mouse(x_str, y_str):
 
 
 def gui_main():
-
     screen_width, screen_height = viewport_size()
 
     root = tk.Tk()
@@ -218,6 +211,7 @@ def gui_main():
     root.minsize(550, 300)
 
     root.mainloop()
+
 
 if __name__ == "__main__":
     gui_main()

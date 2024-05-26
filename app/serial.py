@@ -1,14 +1,15 @@
-import serial
+import logging
+import re
 import threading
 import time
-from serial.tools import list_ports
-import re
 from abc import ABC, abstractmethod
 from typing import List, Optional
-import logging
 
-from .window_actions import move_mouse, show_calibration_dot, hide_calibration_dot
+import serial
+from serial.tools import list_ports
+
 from .localization import setup_localization
+from .window_actions import move_mouse, show_calibration_dot, hide_calibration_dot
 
 _, _lang = setup_localization()
 
@@ -18,6 +19,7 @@ CALIBRATION_REQUIRED = "calibration_required"
 CALIBRATION_DONE = "calibration_done"
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 
 def get_current_serial_connection() -> Optional[serial.Serial]:
     """

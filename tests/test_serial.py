@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import patch, Mock, call, MagicMock
+
 import serial
+
 from app.serial import (
     disconnect_from_serial,
     read_from_serial,
@@ -11,6 +13,7 @@ from app.serial import (
     CalibrationRequiredCommand,
     CalibrationDoneCommand,
 )
+
 
 class TestSerial(unittest.TestCase):
     def test_coordinate_command_matches(self):

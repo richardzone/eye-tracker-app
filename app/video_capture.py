@@ -1,15 +1,14 @@
-import cv2
-import cv2.aruco as aruco
-import numpy as np
+import logging
 import threading
 import time
-from typing import List, Optional
-import logging
-from PIL import Image, ImageTk
 import tkinter as tk
 
-from .window_actions import move_mouse, show_calibration_dot, hide_calibration_dot
+import cv2
+import cv2.aruco as aruco
+from PIL import Image, ImageTk
+
 from .localization import setup_localization
+from .window_actions import move_mouse
 
 _, _lang = setup_localization()
 

@@ -7,9 +7,9 @@ name = "eye_tracker_app"
 dynamic = ["version"]
 description = "A Python application for eye tracking"
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
 authors = [
-    {name = "Richard", email = "1625351+richardzone@users.noreply.github.com"},
+    { name = "Richard", email = "1625351+richardzone@users.noreply.github.com" },
 ]
 urls = { "Homepage" = "https://github.com/richardzone/eye_tracker_app" }
 classifiers = [
@@ -42,4 +42,4 @@ eye-tracker = "app.main:gui_main"
 addopts = "--import-mode=importlib"
 
 [tool.setuptools.packages]
-find = {}  # Scan the project directory with the default parameters
+find = { }  # Scan the project directory with the default parameters
