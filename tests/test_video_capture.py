@@ -1,11 +1,11 @@
+import threading
+import tkinter
 import unittest
 from unittest.mock import patch, Mock, MagicMock
-import cv2
+
 import cv2.aruco as aruco
-import threading
 import numpy as np
-from PIL import ImageTk, Image
-import tkinter
+from PIL import Image
 
 from app.video_capture import (
     convert_aruco_marker_ids_to_coordinates,
@@ -14,7 +14,6 @@ from app.video_capture import (
     start_video_thread,
     stop_video_capture,
     read_from_video_device,
-    get_current_video_device,
     draw_video_image_to_canvas
 )
 
@@ -87,6 +86,7 @@ class TestVideoCapture(unittest.TestCase):
         mock_stop_video_capture.assert_called_once()
         mock_thread.assert_called_once_with(target=read_from_video_device, args=(0, canvas), daemon=True)
         mock_thread_instance.start.assert_called_once()
+
     @patch("cv2.VideoCapture")
     @patch("app.video_capture.detect_aruco_markers")
     @patch("app.video_capture.convert_aruco_marker_ids_to_coordinates")
@@ -118,8 +118,9 @@ class TestVideoCapture(unittest.TestCase):
         mock_stop_event = Mock()
         mock_stop_event.is_set.side_effect = [False, False, False, False, True]
 
-        with patch("app.video_capture.current_video_device", mock_cap), \
-             patch("app.video_capture.stop_event", mock_stop_event):
+        with patch(
+          "app.video_capture.current_video_device", mock_cap
+        ), patch("app.video_capture.stop_event", mock_stop_event):
             read_from_video_device(0, canvas)
             self.assertTrue(mock_cap.read.called)
             self.assertEqual(mock_cap.read.call_count, 4)  # 4 reads before stopping
@@ -127,7 +128,6 @@ class TestVideoCapture(unittest.TestCase):
             mock_convert_aruco_marker_ids_to_coordinates.assert_called()
             mock_move_mouse.assert_called()
             mock_draw_video_image_to_canvas.assert_called()
-
 
     @patch("PIL.ImageTk.PhotoImage")
     @patch("PIL.Image.fromarray")
