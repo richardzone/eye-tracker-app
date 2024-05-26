@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eye_tracker_app"
+dynamic = ["version"]
+description = "A Python application for eye tracking"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Richard", email = "1625351+richardzone@users.noreply.github.com"},
+]
+urls = { "Homepage" = "https://github.com/richardzone/eye_tracker_app" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Operating System :: OS Independent"
+]
+requires-python = ">=3.8"
+dependencies = [
+    "PyAutoGUI==0.9.54",
+    "pyserial==3.5",
+    "opencv-python==4.5.1.48",
+    "opencv-contrib-python==4.5.1.48",
+    "pillow==10.3.0"
+]
+
+[project.optional-dependencies]
+development = [
+    "pytest>=8.2.0",
+    "pytest-cov>=5.0.0",
+    "Babel>=2.15.0",
+    "pyinstaller>=6.6.0",
+    "flake8>=7.0.0"
+]
+
+[project.scripts]
+eye-tracker = "app.main:gui_main"
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
