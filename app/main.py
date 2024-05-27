@@ -180,22 +180,25 @@ def gui_main():
     )
     connect_to_serial_button.grid(row=16, column=0, columnspan=2, pady=10)
 
-    def capture_video():
+    def capture_video(show_video_capture):
         if video_devices_var.get() == _("No Video Devices Available"):
             messagebox.showerror(_("Error"), _("No Video Devices Available"))
             return
 
-        # Create a new top-level window for video display
-        video_window = tk.Toplevel(root)
-        video_window.title(_("Video Capture"))
+        if show_video_capture:
+            # Create a new top-level window for video display
+            video_window = tk.Toplevel(root)
+            video_window.title(_("Video Capture"))
 
-        video_canvas = tk.Canvas(video_window, width=1280, height=720)
-        video_canvas.pack()
+            video_canvas = tk.Canvas(video_window, width=1280, height=720)
+            video_canvas.pack()
+        else:
+            video_canvas = None
 
         start_video_thread(int(video_devices_var.get()), video_canvas)
 
     start_video_capture_button = tk.Button(
-        frame, text=_("Start Video Capture (Hit Esc to Stop)"), command=capture_video
+        frame, text=_("Start Video Capture (Hit Esc to Stop)"), command=lambda: capture_video(show_video_capture=True)
     )
     start_video_capture_button.grid(row=17, column=0, columnspan=2, pady=10)
 
@@ -209,6 +212,12 @@ def gui_main():
     copyright_label.grid(row=19, column=0, columnspan=2, pady=10)
 
     root.minsize(550, 300)
+
+    def minimize_and_capture_video(event=None):
+        capture_video(show_video_capture=False)
+        root.iconify()  # Minimize the window
+
+    root.bind('v', minimize_and_capture_video)
 
     root.mainloop()
 

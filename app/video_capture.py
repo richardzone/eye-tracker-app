@@ -82,12 +82,15 @@ def read_from_video_device(device_index, video_canvas) -> None:
         x, y = convert_aruco_marker_ids_to_coordinates(marker_ids)
         logging.debug(f"x: {x}, y: {y}")
         if x is not None and y is not None:
-            move_mouse(x, y)
+            move_mouse(x, y, 0.1)
 
         cv2.waitKey(50)
 
 
 def draw_video_image_to_canvas(frame, video_canvas):
+    if video_canvas is None:
+        return
+
     img = cv2.resize(frame, (1280, 720))
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_pil = Image.fromarray(img_rgb)
